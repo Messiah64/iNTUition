@@ -6,3 +6,4 @@ cvzone
 mediapipe
 matplotlib
 python-poppler
+cmake
