@@ -5,6 +5,7 @@ import os.path
 import numpy as np
 import streamlit as st
 from pdf2image import convert_from_path
+import fitz
 from PIL import Image
 import streamlit.components.v1 as components
 
@@ -116,11 +117,13 @@ if uploaded_file is not None:
 
     #find the path of that file to convert
     PDF_path = os.path.join(PRESENTATION_FOLDER , PDF_Name)
-    images = convert_from_path(PDF_path)
-    Present_Images_Folder  = IMAGES_FOLDER
-    # Save each PNG image with a numbered filename
-    for i, image in enumerate(images):
-        image.save(os.path.join(Present_Images_Folder, f'{i+1}.png'))
+    doc = fitz.open(PDF_path)
+
+    output_folder = IMAGES_FOLDER
+    for page_num, page in enumerate(doc):
+        image_file = os.path.join(output_folder, f"{page_num + 1}.png")
+        pix = page.get_pixmap()
+        pix.save(image_file)
 
     # Parameters
     width, height = 1280, 720
@@ -161,7 +164,7 @@ if uploaded_file is not None:
     pathImages = sorted(os.listdir(folderPath), key=len)
     print(pathImages)
 
-    if len(os.listdir(Present_Images_Folder)) == 0:
+    if len(os.listdir(None)) == 0:
         print(f"The folder '{folder_path}' is empty")
 
     else:
