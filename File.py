@@ -4,7 +4,8 @@ import os
 import os.path
 import numpy as np
 import streamlit as st
-from pdf2image import convert_from_path
+import logging
+import time
 import fitz
 from PIL import Image
 import streamlit.components.v1 as components
@@ -14,7 +15,15 @@ import streamlit.components.v1 as components
 
 st.markdown("<h1 style='text-align: center;'>AI Assistive Tool</h1>", unsafe_allow_html=True)
 
-# Get the Presentation Slides from Streamlit Website,
+#Logging Config
+logging.basicConfig(format='%(asctime)s - %(levelname)s - %(message)s',
+                    level=logging.INFO)
+
+logging.info("Test")
+st.text
+
+
+# Get the Presentation Slides from Streamlit Website
 
 uploaded_file = st.file_uploader("Choose a PDF file",  key="my_file_uploader", type="pdf")
 
@@ -78,19 +87,47 @@ PATH = os.path.dirname(os.path.abspath(__file__))
 PRESENTATION_FOLDER = os.path.join(PATH, "Presentation")
 IMAGES_FOLDER = os.path.join(PATH, "Images")
 
+st.title("Live Update")
+previous_val = ""
+text_box = st.empty()
+text_box.write(previous_val)
+
+new_val = "Upload PDF File to get started"
+if new_val != previous_val:
+    print("The string variable has changed!")
+    # Perform any actions or logic based on the change
+    text_box.write(new_val)
+    previous_value = new_val
+    
 # Create Presentation Folder if it doesn't exist
 if not os.path.exists(PRESENTATION_FOLDER):
+    new_val += "\nCreating Presentation Folder"
+    if new_val != previous_val:
+        print("The string variable has changed!")
+        # Perform any actions or logic based on the change
+        text_box.write(new_val)
+        previous_value = new_val
     os.makedirs(PRESENTATION_FOLDER)
 # Create images folder if it doesn't exist
 if not os.path.exists(IMAGES_FOLDER):
+    new_val += "\nCreating Images Folder"
+    if new_val != previous_val:
+        print("The string variable has changed!")
+        # Perform any actions or logic based on the change
+        text_box.write(new_val)
+        previous_value = new_val
     os.makedirs(IMAGES_FOLDER)
     
 # Get the Presentation Slides from Streamlit Website,
 if uploaded_file is not None:
 
     # First delete previously uploaded files from Presentation Folder
-    
-
+    new_val += "\nDeleting Previous Files ..."
+    if new_val != previous_val:
+        print("The string variable has changed!")
+        # Perform any actions or logic based on the change
+        text_box.write(new_val)
+        previous_value = new_val
     for file_name in os.listdir(PRESENTATION_FOLDER):
         file_path = os.path.join(PRESENTATION_FOLDER, file_name)
         try:
@@ -101,13 +138,25 @@ if uploaded_file is not None:
             print(f"Error deleting {file_path}: {e}")
 
     # Then upload fresh file to folder
+    new_val += "\nUploading New Files ..."
+    if new_val != previous_val:
+        print("The string variable has changed!")
+        # Perform any actions or logic based on the change
+        text_box.write(new_val)
+        previous_value = new_val
     file_name = uploaded_file.name
     print(f'file_name ----------------------------------------------------:{file_name}')
     file_path = os.path.join(PRESENTATION_FOLDER, uploaded_file.name)
     print(file_path,'thjis doiqwdauiNSfij')
     with open(file_path, "wb") as f:
         f.write(uploaded_file.getbuffer())
-    st.success("File saved successfully.")
+    new_val += "\nFiles uploaded Successfully"
+    if new_val != previous_val:
+        print("The string variable has changed!")
+        # Perform any actions or logic based on the change
+        text_box.write(new_val)
+        previous_value = new_val
+    st.success("File Uploaded successfully.")
 
     # Get name of file
     folder_path = PRESENTATION_FOLDER
@@ -116,6 +165,12 @@ if uploaded_file is not None:
     PDF_Name = file_names[0]
 
     #find the path of that file to convert
+    new_val += "\nProcessing Uploaded Files into Images ..."
+    if new_val != previous_val:
+        print("The string variable has changed!")
+        # Perform any actions or logic based on the change
+        text_box.write(new_val)
+        previous_value = new_val
     PDF_path = os.path.join(PRESENTATION_FOLDER , PDF_Name)
     doc = fitz.open(PDF_path)
 
@@ -138,7 +193,7 @@ if uploaded_file is not None:
 
 
     # Hand Detector
-    detectorHand = HandDetector(detectionCon=0.7, maxHands=1)
+    detectorHand = HandDetector(detectionCon=0.75, maxHands=1)
 
     # Variables
     imgList = []
@@ -154,7 +209,7 @@ if uploaded_file is not None:
     annotations = [[]]
     annotationNumber = -1
     annotationStart = False
-    hs, ws = int(120 * 2), int(213 * 1.75)  # width and height of small image
+    hs, ws = int(50 * 2), int(80 * 1.75)  # width and height of small image
 
     #Dev Mode:  if Test = true, skip all image pro
 
@@ -168,7 +223,12 @@ if uploaded_file is not None:
         print(f"The folder '{folder_path}' is empty")
 
     else:
-
+        new_val += "\nProcessed completed successfully! Enjoy your presentation!"
+        if new_val != previous_val:
+            print("The string variable has changed!")
+            # Perform any actions or logic based on the change
+            text_box.write(new_val)
+            previous_value = new_val
         # Loop through all PNG images in the folder
         folderPath = IMAGES_FOLDER
         for filename in os.listdir(folder_path):
@@ -203,9 +263,11 @@ if uploaded_file is not None:
                 fingers = detectorHand.fingersUp(hand)  # List of which fingers are up
 
                 # Constrain values for easier drawing
-                xVal = int(np.interp(lmList[8][0], [width // 2, width], [0, width + 500]))
-                yVal = int(np.interp(lmList[8][1], [100, height - 100], [0, height + 500]))
+                # Constrain values for easier drawing
+                xVal = int(np.interp(lmList[8][0], [width // 2, width], [0, width + 250]))
+                yVal = int(np.interp(lmList[8][1], [100, height - 100], [0, height + 250]))
                 indexFinger = xVal, yVal
+
 
                 if cy <= gestureThreshold:  # If hand is at the height of the face
                     if fingers == [1, 0, 0, 0, 0]:
@@ -226,7 +288,7 @@ if uploaded_file is not None:
                             annotationStart = False
 
                 if fingers == [0, 1, 1, 0, 0]:
-                    cv2.circle(imgCurrent, indexFinger, 12, (0, 0, 255), cv2.FILLED)
+                    cv2.circle(imgCurrent, indexFinger, 4, (0, 0, 255), cv2.FILLED)
 
                 if fingers == [0, 1, 0, 0, 0]:
                     if annotationStart is False:
@@ -235,7 +297,7 @@ if uploaded_file is not None:
                         annotations.append([])
                     print(annotationNumber)
                     annotations[annotationNumber].append(indexFinger)
-                    cv2.circle(imgCurrent, indexFinger, 12, (0, 0, 255), cv2.FILLED)
+                    cv2.circle(imgCurrent, indexFinger, 4, (0, 0, 255), cv2.FILLED)
 
                 else:
                     annotationStart = False
