@@ -8,6 +8,7 @@ from pdf2image import convert_from_path
 from PIL import Image
 import streamlit.components.v1 as components
 
+
 # Set the target width and height
 
 st.markdown("<h1 style='text-align: center;'>AI Assistive Tool</h1>", unsafe_allow_html=True)
@@ -72,16 +73,25 @@ components.html(
     """
     , height=500, )
 
+PATH = os.path.dirname(os.path.abspath(__file__))
+PRESENTATION_FOLDER = os.path.join(PATH, "Presentation")
+IMAGES_FOLDER = os.path.join(PATH, "Images")
 
-
-
+# Create Presentation Folder if it doesn't exist
+if not os.path.exists(PRESENTATION_FOLDER):
+    os.makedirs(PRESENTATION_FOLDER)
+# Create images folder if it doesn't exist
+if not os.path.exists(IMAGES_FOLDER):
+    os.makedirs(IMAGES_FOLDER)
+    
 # Get the Presentation Slides from Streamlit Website,
 if uploaded_file is not None:
 
     # First delete previously uploaded files from Presentation Folder
-    folder_path = r'C:\Users\Moham\Desktop\DLW-2022\NTU_Hackathon\Presentation'
-    for file_name in os.listdir(folder_path):
-        file_path = os.path.join(folder_path, file_name)
+    
+
+    for file_name in os.listdir(PRESENTATION_FOLDER):
+        file_path = os.path.join(PRESENTATION_FOLDER, file_name)
         try:
             if os.path.isfile(file_path):
                 os.unlink(file_path)
@@ -90,19 +100,24 @@ if uploaded_file is not None:
             print(f"Error deleting {file_path}: {e}")
 
     # Then upload fresh file to folder
-        with open(os.path.join(r'C:\Users\Moham\Desktop\DLW-2022\NTU_Hackathon\Presentation', uploaded_file.name), "wb") as f:
-            f.write(uploaded_file.getbuffer())
-        st.success("File saved successfully.")
+    file_name = uploaded_file.name
+    print(f'file_name ----------------------------------------------------:{file_name}')
+    file_path = os.path.join(PRESENTATION_FOLDER, uploaded_file.name)
+    print(file_path,'thjis doiqwdauiNSfij')
+    with open(file_path, "wb") as f:
+        f.write(uploaded_file.getbuffer())
+    st.success("File saved successfully.")
 
     # Get name of file
-    folder_path = r'C:\Users\Moham\Desktop\DLW-2022\NTU_Hackathon\Presentation'
+    folder_path = PRESENTATION_FOLDER
     file_names = os.listdir(folder_path)
+    
     PDF_Name = file_names[0]
 
     #find the path of that file to convert
-    PDF_path = 'C:/Users/Moham/Desktop/DLW-2022/NTU_Hackathon/Presentation/' + PDF_Name
+    PDF_path = os.path.join(PRESENTATION_FOLDER , PDF_Name)
     images = convert_from_path(PDF_path)
-    Present_Images_Folder  = r'C:\Users\Moham\Desktop\DLW-2022\NTU_Hackathon\Present_Images'
+    Present_Images_Folder  = IMAGES_FOLDER
     # Save each PNG image with a numbered filename
     for i, image in enumerate(images):
         image.save(os.path.join(Present_Images_Folder, f'{i+1}.png'))
@@ -110,7 +125,7 @@ if uploaded_file is not None:
     # Parameters
     width, height = 1280, 720
     gestureThreshold = 300
-    folderPath = r'C:\Users\Moham\Desktop\DLW-2022\NTU_Hackathon\Present_Images'
+    folderPath = IMAGES_FOLDER
 
     # Camera Setup
     cap = cv2.VideoCapture(0)
@@ -152,7 +167,7 @@ if uploaded_file is not None:
     else:
 
         # Loop through all PNG images in the folder
-        folderPath = r"C:\Users\Moham\Desktop\DLW-2022\NTU_Hackathon\Present_Images"
+        folderPath = IMAGES_FOLDER
         for filename in os.listdir(folder_path):
             if filename.endswith('.png'):
                 # Open the image and resize it
