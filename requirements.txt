@@ -1,7 +1,6 @@
 numpy
-opencv-python-headless
+opencv-python
 streamlit
-pdf2image
 cvzone
 mediapipe
 matplotlib
